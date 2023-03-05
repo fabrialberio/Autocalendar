@@ -1,0 +1,5 @@
+/.vscode
+/config/*
+!/config/google_credentials.json
+*.pyc
+*.ipynb
