@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
+from typing_extensions import Protocol
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
 
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
