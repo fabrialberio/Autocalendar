@@ -2,6 +2,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from googleapiclient.errors import HttpError
+
 from .google_api import GoogleAPI, GoogleAPIObject, Resource
 
 
@@ -81,7 +83,10 @@ class Event(GoogleAPIObject):
         return self
 
     def _update(self):
-        self._dict = self._service.events().get(calendarId=self._calendar.id, eventId=self.id).execute()
+        try:
+            self._dict = self._service.events().get(calendarId=self._calendar.id, eventId=self.id).execute()
+        except HttpError as e:
+            raise HttpError(resp=e.resp, content=f"Error requesting event  with ID '{self.id}'")
 
 
 class Calendar(GoogleAPIObject):

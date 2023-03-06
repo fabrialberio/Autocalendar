@@ -4,8 +4,8 @@ from pathlib import Path
 from enum import Enum
 from json import load, dump
 
-from .google_calendar import Event, Calendar, get_calendar_service
-from .mastercom import MastercomAPI, Assignment, AssignmentType, get_token
+from .google_calendar import Event, Calendar, get_calendar_service, HttpError
+from .mastercom import MastercomAPI, Assignment, AssignmentType
 
 
 ADDED_EVENTS_PATH = Path('config/added_events.json')
@@ -74,22 +74,22 @@ class CalendarAdder:
 
         return CalendarAdder(calendar, mastercom)
 
-    def add_assignment(self, assignment: Assignment, event: 'Event | None'):
+    def add_assignment(self, assignment: Assignment, existing_event: 'Event | None'):
         body = body_from_assignment(assignment)
 
-        if event != None:
-            if body['summary'] == event.summary and body['description'] == event.description:
-                self.result_tally[AddResult.SKIP].append(event)
+        if existing_event is not None:
+            if body['summary'] == existing_event.summary and body['description'] == existing_event.description:
+                self.result_tally[AddResult.SKIP].append(existing_event)
             else:
-                event.patch(body)
-                self.result_tally[AddResult.PATCH].append(event)
+                existing_event.patch(body)
+                self.result_tally[AddResult.PATCH].append(existing_event)
         else:
-            event = self.calendar.add(body)
-            self.result_tally[AddResult.ADD].append(event)
+            existing_event = self.calendar.add(body)
+            self.result_tally[AddResult.ADD].append(existing_event)
 
             with open(ADDED_EVENTS_PATH, 'r') as file:
                 added_events = load(file)
-                added_events[assignment.unique_id] = event.id
+                added_events[assignment.unique_id] = existing_event.id
 
             with open(ADDED_EVENTS_PATH, 'w') as file:
                 dump(added_events, file, indent=True)
@@ -113,7 +113,13 @@ class CalendarAdder:
 
         for a in assignments:
             event_id = added_events.get(a.unique_id)
-            event = self.calendar.event(event_id) if event_id != None else None
+            event = None
+
+            if event_id is not None:
+                try:
+                    event = self.calendar.event(event_id)
+                except HttpError:
+                    pass
 
             self.add_assignment(a, event)
 
