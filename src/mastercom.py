@@ -118,12 +118,17 @@ class MastercomAPI:
         self.url = BASE_URL.format(mastercom_id, 3) + f'/scuole/{school_id}/studenti/{student_id}/{school_year}_{school_year + 1}'
         self.token = token
 
-    def request(self, request_type: AssignmentType, start: datetime = None, end: datetime = None, params: dict = {}) -> list:
+    def request(self, 
+            request_type: AssignmentType, 
+            start: datetime = None, 
+            end: datetime = None, 
+            params: dict = {}
+        ) -> list:
         headers = {'Authorization': f'JWT {self.token}'}
 
-        params = params | {
+        params.update({
             'data_inizio': start.date().isoformat() if start != None else None,
-            'data_fine': end.date().isoformat() if end != None else None}
+            'data_fine': end.date().isoformat() if end != None else None})
 
         response = get(f'{self.url}/{REQUEST_MAP[request_type]}', headers=headers, params=params)
 
