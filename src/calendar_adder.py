@@ -35,7 +35,7 @@ def body_from_assignment(assignment: Assignment) -> dict:
 
     return {
         'summary': summary,
-        'description': description + f' (Aggiunto il  {datetime.now().strftime("%D")})',
+        'description': description + f' (Aggiunto il  {datetime.now().strftime("%d-%m-%Y")})',
 
         'start': start,
         'end':   end,
