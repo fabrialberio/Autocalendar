@@ -1,6 +1,12 @@
 from pathlib import Path
 from json import dump
-from os import chdir
+from os import system, chdir
+
+chdir(Path(__file__).parent) # Assicura che il programma possa accedere agli altri file nella cartella
+
+print('[i] Installing required packages...')
+system("pip install -r requirements.txt")
+print()
 
 from src.google_calendar import API_SCOPES
 from src.calendar_adder import ADDED_EVENTS_PATH
@@ -47,4 +53,4 @@ if __name__ == '__main__':
         with open(ADDED_EVENTS_PATH, 'w+') as file:
             dump({}, file)
 
-    input('\nSetup concluso, premere invio per chiudere la finestra') # Per evitare che si chiuda la finestra
+    input('\n[i] Setup concluso, premere invio per chiudere la finestra') # Per evitare che si chiuda la finestra
