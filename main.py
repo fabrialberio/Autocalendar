@@ -21,6 +21,10 @@ MASTERCOM_STUDENT_ID = 1005465
 if __name__ == '__main__':
     chdir(Path(__file__).parent) # Assicura che il programma possa accedere agli altri file nella cartella
 
+    if not MASTERCOM_TOKEN_PATH.exists() or not GOOGLE_TOKEN_PATH.exists():
+        print('[i] Required files not found, make shure you run setup.py before this file')
+        exit()
+    
     # Recupera dal file l'ID del calendario
     with open(CALENDAR_ID_PATH, 'r') as file:
         calendar_id = load(file)['calendar_id']
